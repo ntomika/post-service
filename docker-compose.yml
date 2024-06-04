@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: my_system
+    profiles:
+      - postgresql
+    ports:
+      - "5433:5432"
+
+
+  app_with_postgress:
+    build:
+      context: .
+      dockerfile: pg.Dockerfile
+    environment:
+      STORAGE_TYPE: postgres
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: my_system
+    ports:
+      - "8080:8080"
+    profiles:
+      - postgresql
+    depends_on:
+      - db
+
+
+  app_with_inmemory:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      STORAGE_TYPE: inmemory
+    profiles:
+      - inmemory
